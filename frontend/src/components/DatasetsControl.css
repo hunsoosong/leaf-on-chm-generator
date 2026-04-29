@@ -1,0 +1,60 @@
+.control {
+    position: absolute;
+    color: #000000;
+    background-color: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 15px;
+    top: 88px;
+    left: 8px;
+    height: auto;
+    width: auto;
+    padding: 15px;
+}
+
+.control > form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.submit-button {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* Remove borders */
+    padding: 12px 20px; /* Add some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Keep it inline */
+    font-size: 16px; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+  }
+  
+.submit-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.submit-button:disabled {
+    background-color: #cccccc;
+    color: #636363;
+    cursor: not-allowed;
+}
+
+.reset-button {
+    background-color: #e11d48; /* Rose background */
+    color: white; /* White text */
+    border: none; /* Remove borders */
+    padding: 12px 20px; /* Add some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Keep it inline */
+    font-size: 16px; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+  }
+  
+.reset-button:hover {
+    background-color: #9f1239; /* Darker rose on hover */
+}

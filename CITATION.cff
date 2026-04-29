@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite both the manuscript and the Zenodo archive listed below."
+title: "Leaf-on CHM Generator: Source code and supporting materials"
+type: software
+authors:
+  - family-names: Kim
+    given-names: Yeonjae
+    affiliation: "Lyles School of Civil Engineering, Purdue University"
+  - family-names: Song
+    given-names: Hunsoo
+    affiliation: "Department of Civil Engineering, Chungbuk National University"
+    email: hunsoo.song@cbnu.ac.kr
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: Fei
+    given-names: Songlin
+    affiliation: "Department of Forestry & Natural Resources, Purdue University"
+  - family-names: Jung
+    given-names: Jinha
+    affiliation: "Lyles School of Civil Engineering, Purdue University"
+version: "1.0.0"
+date-released: "2026-04-29"
+license: MIT
+repository-code: "https://github.com/hunsoosong/leaf-on-chm-generator"
+url: "https://log.d2s.org"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.xxxxxxx
+    description: "Zenodo archive for this software release"
+preferred-citation:
+  type: article
+  title: "Transforming Leaf-off LiDAR to Leaf-on Canopy Height Models Using Deep Learning"
+  authors:
+    - family-names: Kim
+      given-names: Yeonjae
+    - family-names: Song
+      given-names: Hunsoo
+    - family-names: Fei
+      given-names: Songlin
+    - family-names: Jung
+      given-names: Jinha
+  journal: "GIScience & Remote Sensing"
+  year: 2026

@@ -1,0 +1,99 @@
+services:
+  frontend:
+    build:
+      context: './frontend'
+      dockerfile: frontend.dockerfile
+    image: gdslab/log-frontend:dev
+    platform: linux/x86_64
+    command: yarn run dev --host 0.0.0.0 --port 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: always
+
+  backend:
+    build:
+      context: './backend'
+      dockerfile: backend.dockerfile
+      args:
+        INSTALL_DEV: true
+        NUM_OF_WORKERS: 4
+    image: gdslab/log-backend:dev
+    platform: linux/x86_64
+    ports: 
+      - 5000:5000
+    volumes:
+      - ./backend:/app
+      - db-data:/var/lib/app
+      - user-data:/static
+    restart: always
+    env_file:
+      - .backend.env
+
+  celery_worker:
+    image: gdslab/log-backend:dev
+    platform: linux/x86_64
+    command: /app/worker-start.sh
+    volumes:
+      - db-data:/var/lib/app
+      - user-data:/static
+    restart: always
+    depends_on:
+      - redis
+    env_file:
+      - .backend.env
+
+  titiler:
+    image: ghcr.io/developmentseed/titiler:0.19.0
+    volumes:
+      - user-data:/static
+    environment:
+      # Application
+      - HOST=0.0.0.0
+      - PORT=8888
+      # Gunicorn / Uvicorn
+      # https://github.com/tiangolo/uvicorn-gunicorn-docker#web_concurrency
+      # - WEB_CONCURRENCY=1
+      - ACCESS_LOG=/var/log/titiler-access.log
+      - ERROR_LOG=/var/log/titiler-error.log
+      # https://github.com/tiangolo/uvicorn-gunicorn-docker#workers_per_core
+      - WORKERS_PER_CORE=1
+      # GDAL config
+      - CPL_TMPDIR=/tmp
+      - GDAL_CACHEMAX=75%
+      - GDAL_INGESTED_BYTES_AT_OPEN=32768
+      - GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
+      - GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
+      - GDAL_HTTP_MULTIPLEX=YES
+      - GDAL_HTTP_VERSION=2
+      - PYTHONWARNINGS=ignore
+      - VSI_CACHE=TRUE
+      - VSI_CACHE_SIZE=536870912
+      - CPL_VSIL_CURL_ALLOWED_EXTENSIONS=.tif,.TIF,.tiff
+      - CPL_VSIL_CURL_CACHE_SIZE=200000000
+
+
+  redis:
+    image: redis:alpine
+    platform: linux/x86_64
+    restart: always
+
+  proxy:
+    build: 
+      context: ./proxy
+      dockerfile: proxy.dockerfile
+    platform: linux/x86_64
+    tmpfs:
+      - /tmp
+    ports:
+      - "0.0.0.0:8001:80"
+    restart: always
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  db-data:
+  user-data:

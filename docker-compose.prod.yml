@@ -1,0 +1,213 @@
+services:
+  frontend:
+    build:
+      context: './frontend'
+      dockerfile: frontend.prod.dockerfile
+    image: gdslab/log-frontend:latest
+    platform: linux/x86_64
+    depends_on:
+      - backend
+    tmpfs:
+      - /tmp
+    read_only: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    security_opt:
+      - no-new-privileges=true
+
+
+  backend:
+    build:
+      context: './backend'
+      dockerfile: backend.dockerfile
+      args:
+        INSTALL_DEV: false
+        NUM_OF_WORKERS: 1
+    image: gdslab/log-backend:latest
+    platform: linux/x86_64
+    volumes:
+      - db-data:/var/lib/app
+      - user-data:/static
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '4'
+          memory: 2G
+        reservations:
+          cpus: '2'
+          memory: 1G
+    security_opt:
+      - no-new-privileges=true
+    env_file:
+      - .backend.env
+
+  celery_worker:
+    image: gdslab/log-backend:latest
+    platform: linux/x86_64
+    command: /app/worker-start.sh
+    volumes:
+      - db-data:/var/lib/app
+      - user-data:/static
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.tasks", "inspect", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    security_opt:
+      - no-new-privileges=true
+    env_file:
+      - .backend.env
+
+  titiler:
+    image: ghcr.io/developmentseed/titiler:0.19.0
+    volumes:
+      - user-data:/static
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    security_opt:
+      - no-new-privileges
+    environment:
+      # Application
+      - HOST=0.0.0.0
+      - PORT=8888
+      # Gunicorn / Uvicorn
+      # https://github.com/tiangolo/uvicorn-gunicorn-docker#web_concurrency
+      - WEB_CONCURRENCY=5
+      - ACCESS_LOG=/var/log/titiler-access.log
+      - ERROR_LOG=/var/log/titiler-error.log
+      # https://github.com/tiangolo/uvicorn-gunicorn-docker#workers_per_core
+      #- WORKERS_PER_CORE=1
+      # GDAL config
+      - CPL_TMPDIR=/tmp
+      - GDAL_CACHEMAX=75%
+      - GDAL_INGESTED_BYTES_AT_OPEN=32768
+      - GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
+      - GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
+      - GDAL_HTTP_MULTIPLEX=YES
+      - GDAL_HTTP_VERSION=2
+      - PYTHONWARNINGS=ignore
+      - VSI_CACHE=TRUE
+      - VSI_CACHE_SIZE=536870912
+      - CPL_VSIL_CURL_ALLOWED_EXTENSIONS=.tif,.TIF,.tiff
+      - CPL_VSIL_CURL_CACHE_SIZE=200000000
+
+  redis:
+    image: redis:alpine
+    platform: linux/x86_64
+    user: redis
+    read_only: true
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+    security_opt:
+      - no-new-privileges=true
+
+  proxy:
+    build: 
+      context: ./proxy
+      dockerfile: proxy.prod.dockerfile
+    image: gdslab/log-proxy:latest
+    platform: linux/x86_64
+    tmpfs:
+      - /tmp
+    ports:
+      - "0.0.0.0:8010:80"
+    depends_on:
+      - frontend
+      - backend
+      - titiler
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    security_opt:
+      - no-new-privileges=true
+
+volumes:
+  db-data:
+  user-data:
