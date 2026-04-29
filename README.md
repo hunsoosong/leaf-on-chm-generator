@@ -6,7 +6,7 @@ This repository contains the source code of the **Leaf-on Canopy Height Model (C
 
 The deployed web application is available at: **https://log.d2s.org**
 
-This repository is archived on Zenodo with DOI: **[10.5281/zenodo.xxxxxxx](https://doi.org/10.5281/zenodo.xxxxxxx)** *(replace with the final DOI after publishing the Zenodo record)*
+This repository is archived on Zenodo: **[10.5281/zenodo.19876738](https://doi.org/10.5281/zenodo.19876738)**
 
 > Note: This repository is a snapshot maintained for archival and reproducibility purposes. The original development repository is at <https://github.com/gdslab/leaf-on-generator>.
 
@@ -27,7 +27,7 @@ If you use this software, model architecture, or web application in your researc
   author    = {Kim, Yeonjae and Song, Hunsoo and Fei, Songlin and Jung, Jinha},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.xxxxxxx}
+  doi       = {10.5281/zenodo.19876738}
 }
 ```
 

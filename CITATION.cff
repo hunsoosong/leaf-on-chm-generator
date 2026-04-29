@@ -24,7 +24,7 @@ repository-code: "https://github.com/hunsoosong/leaf-on-chm-generator"
 url: "https://log.d2s.org"
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.xxxxxxx
+    value: 10.5281/zenodo.19876738
     description: "Zenodo archive for this software release"
 preferred-citation:
   type: article
