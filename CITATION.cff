@@ -19,7 +19,7 @@ authors:
     affiliation: "Lyles School of Civil Engineering, Purdue University"
 version: "1.0.0"
 date-released: "2026-04-29"
-license: MIT
+license: CC-BY-4.0
 repository-code: "https://github.com/hunsoosong/leaf-on-chm-generator"
 url: "https://log.d2s.org"
 identifiers:
