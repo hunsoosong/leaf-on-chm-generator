@@ -101,7 +101,7 @@ The training procedure, dataset splits, and evaluation methodology are described
 
 ## License
 
-This software is released under the MIT License. See [`LICENSE`](LICENSE).
+The source code, documentation, data, and supporting materials in this repository are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
 
 The inputs to and outputs from the deep learning pipeline are derived from publicly available data sources (3DEP, NEON, NAIP), each governed by its own usage terms.
 
