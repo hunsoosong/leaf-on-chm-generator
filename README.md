@@ -1,18 +1,24 @@
 # Leaf-on CHM Generator
 
-This repository contains the source code of the **Leaf-on Canopy Height Model (CHM) Generator** web application, the deep learning model architectures (Pix2Pix and U-Net), and the inference pipeline supporting the manuscript:
+This repository contains the source code for the **Leaf-on Canopy Height Model (CHM) Generator** web application, the Pix2Pix and U-Net model architectures, and the inference pipeline supporting the manuscript:
 
 > Kim, Y., Song, H., Fei, S., & Jung, J. (2026). *Transforming Leaf-off LiDAR to Leaf-on Canopy Height Models Using Deep Learning.* GIScience & Remote Sensing.
 
-The deployed web application is available at: **https://log.d2s.org**
+The deployed web application is available at:
 
-This repository is archived on Zenodo: **[10.5281/zenodo.19876738](https://doi.org/10.5281/zenodo.19876738)**
+**https://log.d2s.org**
 
-> Note: This repository is a snapshot maintained for archival and reproducibility purposes. The original development repository is at <https://github.com/gdslab/leaf-on-generator>.
+The source code and supporting materials are archived on Zenodo:
+
+**https://doi.org/10.5281/zenodo.19876738**
+
+The trained model weights used in the study are publicly available through GitHub Release v1.1.0:
+
+**https://github.com/hunsoosong/leaf-on-chm-generator/releases/tag/v1.1.0**
 
 ## Citation
 
-If you use this software, model architecture, or web application in your research, please cite both the manuscript and the archive:
+If you use this software, model architecture, trained model weights, or web application in your research, please cite both the manuscript and the archived materials:
 
 ```bibtex
 @article{kim2026leafonchm,
@@ -27,84 +33,115 @@ If you use this software, model architecture, or web application in your researc
   author    = {Kim, Yeonjae and Song, Hunsoo and Fei, Songlin and Jung, Jinha},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.19876738}
+  doi       = {10.5281/zenodo.19876738},
+  url       = {https://doi.org/10.5281/zenodo.19876738}
 }
 ```
 
 ## What this repository contains
 
-| Component | Path | Description |
+| Component | Path or location | Description |
 |---|---|---|
-| Frontend | `frontend/` | React + Vite + TypeScript web client. AOI selection, dataset visualization, result download. |
-| Backend | `backend/app/` | FastAPI server. Handles requests, orchestrates the inference pipeline, manages tasks via Celery. |
-| Inference pipeline (LiDAR-only, Pix2Pix) | `backend/app/ml/lidar/` | DTM/DSM generation from 3DEP EPT, NDHM derivation, patch-based Pix2Pix inference, building artifact removal. |
-| Inference pipeline (LiDAR + NAIP, U-Net) | `backend/app/ml/lidar_and_naip/` | Combined pipeline using LiDAR-derived CHM and NAIP multispectral imagery. |
-| Building raster utilities | `backend/app/ml/building_raster.py` | Building footprint extraction used to remove building structures from canopy outputs. |
-| Reverse proxy | `proxy/` | Nginx configuration for development and production. |
+| Frontend | `frontend/` | React + Vite + TypeScript web client for area-of-interest selection, dataset visualization, and result download. |
+| Backend | `backend/app/` | FastAPI server handling requests, inference orchestration, and Celery-based task management. |
+| LiDAR-only inference pipeline | `backend/app/ml/lidar/` | DTM/DSM generation from 3DEP EPT, NDHM derivation, patch-based Pix2Pix inference, and building artifact removal. |
+| LiDAR + NAIP inference pipeline | `backend/app/ml/lidar_and_naip/` | U-Net inference using a LiDAR-derived CHM and NAIP multispectral imagery. |
+| Building raster utilities | `backend/app/ml/building_raster.py` | Building-footprint processing used to remove building structures from canopy outputs. |
+| Reverse proxy | `proxy/` | Nginx configuration for development and production deployment. |
 | Container orchestration | `docker-compose.yml`, `docker-compose.prod.yml` | Service definitions for local and production deployment. |
+| Trained model weights | [GitHub Release v1.1.0](https://github.com/hunsoosong/leaf-on-chm-generator/releases/tag/v1.1.0) | Publicly downloadable Pix2Pix and U-Net model weights used in the study. |
 
 ## Trained model weights
 
-Trained weights are **not bundled in this repository**. They are accessible through the deployed web application at <https://log.d2s.org>, which exposes the pre-trained Pix2Pix and U-Net models for on-demand leaf-on CHM generation across the United States.
+The trained model weights used in the study are openly available through GitHub Release v1.1.0 under the Creative Commons Attribution 4.0 International License (CC BY 4.0):
 
-For local execution, the inference pipeline expects the following weight files in `backend/app/ml/`:
+**https://github.com/hunsoosong/leaf-on-chm-generator/releases/tag/v1.1.0**
 
-- `test_oct2_.h5` — Pix2Pix generator trained on leaf-off CHM → leaf-on CHM (LiDAR-only)
-- `best_naip_unet_model.h5` — U-Net trained on (leaf-off CHM + NAIP imagery) → leaf-on CHM
+The release includes:
 
-Please contact the corresponding author (`hunsoo.song@cbnu.ac.kr`) for access to the trained weights for academic, non-commercial reproducibility purposes.
+- `pix2pix.h5`: trained weights for the CHM-only Pix2Pix model
+- `unet.h5`: trained weights for the CHM + NAIP U-Net model
 
-## Model details (summary)
+The files are publicly downloadable without login or access approval.
+
+For local execution, the current inference pipeline expects the following filenames in `backend/app/ml/`:
+
+| Downloaded file | Local filename expected by the pipeline |
+|---|---|
+| `pix2pix.h5` | `test_oct2_.h5` |
+| `unet.h5` | `best_naip_unet_model.h5` |
+
+After downloading, place the files in `backend/app/ml/` and rename them as indicated above.
+
+## Model details
 
 The training procedure, dataset splits, and evaluation methodology are described in full in the manuscript. Briefly:
 
-- **Inputs:** USGS 3DEP leaf-off airborne LiDAR (Quality Level 2). Optional: USDA NAIP 4-band multispectral imagery (RGB + NIR).
+- **Inputs:** USGS 3DEP leaf-off airborne LiDAR. The U-Net configuration additionally uses USDA NAIP four-band multispectral imagery.
 - **Reference:** NEON leaf-on airborne LiDAR.
-- **Patch size:** 256 m × 256 m at 1 m resolution.
-- **Pix2Pix (CHM-only):** U-Net generator + PatchGAN discriminator. L1 + adversarial loss. ADAM, lr = 0.001, batch size = 1, 100 epochs.
-- **U-Net (CHM + NAIP):** Encoder depth 4. MSE loss. ADAM, lr = 0.001, batch size = 16, 100 epochs.
-- **Training data:** 2,907 non-overlapping patches from 7 sites across 3 U.S. states.
-- **Test data:** 744 non-overlapping patches from 4 independent sites across 2 U.S. states.
+- **Patch size:** 256 m × 256 m at 1 m spatial resolution.
+- **Pix2Pix, CHM-only:** U-Net generator with a PatchGAN discriminator; adversarial loss plus 100 × L1 loss; Adam optimizer; learning rate = 0.001; batch size = 1; maximum 100 epochs; validation-selected epoch = 31.
+- **U-Net, CHM + NAIP:** Encoder depth of 4; MSE loss; Adam optimizer; learning rate = 0.0001; batch size = 8; maximum 200 epochs; validation-selected epoch = 113.
+- **Training data:** 2,907 non-overlapping patches from seven sites across three U.S. states.
+- **Test data:** 744 non-overlapping patches from four independent test sites across two U.S. states.
 
 ## Running locally with Docker Compose
 
-1. Place the trained weights in `backend/app/ml/`:
-   - `test_oct2_.h5`
-   - `best_naip_unet_model.h5`
+1. Download the trained model weights from GitHub Release v1.1.0:
+
+   **https://github.com/hunsoosong/leaf-on-chm-generator/releases/tag/v1.1.0**
+
+   Place the files in `backend/app/ml/` using the following filenames:
+
+   - `pix2pix.h5` → `test_oct2_.h5`
+   - `unet.h5` → `best_naip_unet_model.h5`
 
 2. Copy `.backend.env.example` to `.backend.env` and configure:
-   - `AOI_AREA_LIMIT` (integer): maximum allowable user-drawn area in square meters.
-   - `SECRET_KEY` (string): your own unique, strong secret key.
+
+   - `AOI_AREA_LIMIT`: maximum allowable user-drawn area in square meters
+   - `SECRET_KEY`: a unique and secure secret key
 
 3. Copy `frontend/.env.development.example` to `frontend/.env.development` and configure:
-   - `VITE_AOI_AREA_LIMIT` (integer): should match the backend value.
-   - `VITE_MAPBOX_ACCESS_TOKEN` (string): your Mapbox access token for displaying the basemap.
+
+   - `VITE_AOI_AREA_LIMIT`: should match the backend value
+   - `VITE_MAPBOX_ACCESS_TOKEN`: a Mapbox access token for displaying the basemap
 
 4. Build and start the services from the repository root:
+
    ```bash
    docker compose build
    docker compose up -d
    ```
 
-5. Access the application at `http://localhost:8001`.
+5. Access the application at:
 
-6. Stop with:
+   ```text
+   http://localhost:8001
+   ```
+
+6. Stop the services with:
+
    ```bash
    docker compose down
    ```
 
 ## Public data sources used in this study
 
-- **Leaf-off airborne LiDAR:** USGS 3D Elevation Program (3DEP) — https://www.usgs.gov/3d-elevation-program
-- **Leaf-on airborne LiDAR:** National Ecological Observatory Network (NEON) — https://www.neonscience.org/
-- **Multispectral imagery:** USDA National Agriculture Imagery Program (NAIP) — https://naip-usdaonline.hub.arcgis.com/
+- **Leaf-off airborne LiDAR:** USGS 3D Elevation Program (3DEP)  
+  https://www.usgs.gov/3d-elevation-program
+
+- **Leaf-on airborne LiDAR:** National Ecological Observatory Network (NEON)  
+  https://www.neonscience.org/
+
+- **Multispectral imagery:** USDA National Agriculture Imagery Program (NAIP)  
+  https://naip-usdaonline.hub.arcgis.com/
 
 ## License
 
-The source code, documentation, data, and supporting materials in this repository are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+The source code, documentation, trained model weights, and supporting materials made available through this repository are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
 
-The inputs to and outputs from the deep learning pipeline are derived from publicly available data sources (3DEP, NEON, NAIP), each governed by its own usage terms.
+The public input datasets used by the pipeline, including 3DEP, NEON, and NAIP data, remain subject to the terms and policies of their respective data providers.
 
 ## Acknowledgements
 
-Funding for this project was provided by the USDA National Institute of Food and Agriculture (NIFA) (Award No. 2023-68012-38992), the Natural Resources Conservation Service (NRCS) (Award No. NR233A750004G044), and the National Research Foundation of Korea (NRF) grant funded by the Korean government (MSIT) (Award No. RS-2026-25499133).
+Funding for this project was provided by the USDA National Institute of Food and Agriculture (NIFA) under Award No. 2023-68012-38992, the Natural Resources Conservation Service (NRCS) under Award No. NR233A750004G044, and the National Research Foundation of Korea (NRF) grants funded by the Korean government (MSIT) (Award Nos. RS-2025-24803224 and RS-2026-25499133).
