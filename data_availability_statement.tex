@@ -1,26 +1,7 @@
-% =============================================================================
-% Drop-in replacement for the existing \section*{Data availability statement}
-% in elsarticle-template-num.tex (currently lines ~507-508).
-%
-% Before submitting:
-%   1. Replace 10.5281/zenodo.19876738 with the actual DOI assigned by Zenodo.
-%   2. Replace github.com/hunsoosong/leaf-on-chm-generator with your final
-%      GitHub repo URL (or remove that sentence if you only want to cite Zenodo).
-%   3. Make sure cas-refs.bib contains the @misc{kim2026leafonchmcode, ...}
-%      entry shown below so that \cite{kim2026leafonchmcode} resolves.
-%   4. Optionally also add \cite{} entries for 3DEP, NEON, NAIP (the keys
-%      used elsewhere in the manuscript: 3DEP, NEON, NAIP) -- they are
-%      already cited in the body, but adding them here strengthens the DAS.
-% =============================================================================
-
 \section*{Data availability statement}
-The source code of the interactive Leaf-on CHM Generator web application, including the deep learning model architectures (Pix2Pix and U-Net) and the inference pipeline, is openly available in Zenodo at https://doi.org/10.5281/zenodo.19876738 \cite{kim2026leafonchmcode} and at https://github.com/hunsoosong/leaf-on-chm-generator. The deployed web application, which provides access to the pre-trained models for on-demand leaf-on canopy height model generation across the United States, is available at https://log.d2s.org. Trained model weights are accessible through the web application, and are additionally available from the corresponding author upon reasonable request for academic, non-commercial reproducibility purposes. The leaf-off airborne LiDAR data used in this study are publicly available from the U.S. Geological Survey's 3D Elevation Program (3DEP) \cite{3DEP}. The leaf-on airborne LiDAR reference data are publicly available from the National Ecological Observatory Network (NEON) \cite{NEON}. The multispectral imagery used in this study is publicly available through the USDA National Agriculture Imagery Program (NAIP) \cite{NAIP}.
+The source code and supporting materials for the Leaf-on CHM Generator framework, including the deep learning model architectures and the inference pipeline, are openly available in Zenodo at \url{https://doi.org/10.5281/zenodo.19876738} and in the corresponding public GitHub repository at \url{https://github.com/hunsoosong/leaf-on-chm-generator} \cite{kim2026leafonchmdata}. \textcolor{blue}{The trained Pix2Pix and U-Net model weights used in this study are openly available through GitHub Release v1.1.0 at \url{https://github.com/hunsoosong/leaf-on-chm-generator/releases/tag/v1.1.0}. The source code, supporting materials, and trained model weights are publicly accessible without login or access approval and are provided under the Creative Commons Attribution 4.0 International License (CC BY 4.0).} The deployed web application, which provides access to the pre-trained models for \textcolor{blue}{on-demand leaf-on CHM generation from user-selected areas with available input data}, is available at \url{https://log.d2s.org}. The leaf-off airborne LiDAR data used in this study are publicly available from the U.S. Geological Survey's 3D Elevation Program (3DEP) \cite{3DEP}. The leaf-on airborne LiDAR reference data are publicly available from the National Ecological Observatory Network (NEON) \cite{NEON}. The multispectral imagery used in this study is publicly available through the USDA National Agriculture Imagery Program (NAIP) \cite{NAIP}.
 
 
-% =============================================================================
-% Add the following entry to cas-refs.bib (Reference list).
-% =============================================================================
-%
 % @misc{kim2026leafonchmcode,
 %   title     = {Source code and supporting materials for ``Transforming Leaf-off LiDAR to Leaf-on Canopy Height Models Using Deep Learning''},
 %   author    = {Kim, Yeonjae and Song, Hunsoo and Fei, Songlin and Jung, Jinha},
@@ -28,4 +9,3 @@ The source code of the interactive Leaf-on CHM Generator web application, includ
 %   publisher = {Zenodo},
 %   doi       = {10.5281/zenodo.19876738}
 % }
-%
